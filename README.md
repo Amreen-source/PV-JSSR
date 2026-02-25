@@ -8,7 +8,7 @@ Official PyTorch implementation of **PV-JSSR**, a unified framework that jointly
 
 > **PV-JSSR: Joint Super-Resolution and Segmentation with Cross-Task Interaction for Photovoltaic Panel Mapping from Multi-Resolution Imagery**  
 > Amreen Batool
-> Department of Electronic Engineering, Jeju National University
+> Department of Compter Engineering, Jeju National University
 
 ---
 
