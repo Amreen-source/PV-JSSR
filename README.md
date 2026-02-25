@@ -7,7 +7,7 @@
 Official PyTorch implementation of **PV-JSSR**, a unified framework that jointly performs 8× super-resolution and semantic segmentation of photovoltaic panels from multi-resolution satellite imagery.
 
 > **PV-JSSR: Joint Super-Resolution and Segmentation with Cross-Task Interaction for Photovoltaic Panel Mapping from Multi-Resolution Imagery**  
-> Amreen Batool
+> Amreen Batool,
 > Department of Compter Engineering, Jeju National University
 
 ---
