@@ -1,0 +1,107 @@
+# PV-JSSR Configuration
+# Default training configuration for the Jiangsu Province PV dataset
+
+model:
+  name: "PV-JSSR"
+  encoder:
+    backbone: "swin_transformer"
+    channels: [64, 128, 256, 512]
+    num_heads: [2, 4, 8, 16]
+    window_size: 7
+    drop_path_rate: 0.1
+    pretrained: true
+  
+  gsd_embedding:
+    dim: 512
+    sinusoidal_dim: 256
+    mlp_hidden: 512
+
+  sr_decoder:
+    diffusion_steps: 1000
+    channels: 64
+    channel_mult: [1, 2, 4, 4]
+    num_res_blocks: 2
+    attention_resolutions: [16, 8]
+    ddim_steps: 50            # inference sampling steps
+    beta_schedule: "linear"
+    beta_start: 0.0001
+    beta_end: 0.02
+  
+  seg_decoder:
+    channels: [512, 256, 128, 64]
+    attention_gates: true
+    sr_injection: true
+    gamma_init: 0.0           # learnable scaling param initial value
+  
+  ctim:
+    num_heads: 8
+    dim: 64
+    dropout: 0.1
+    gated_fusion: true
+  
+  mrcm:
+    alpha: 0.5    # feature consistency weight
+    beta: 1.0     # prediction consistency weight
+
+data:
+  root: "./data"
+  input_size: 128            # LR input size
+  output_size: 512           # HR output size (8x)
+  gsd_levels: [0.1, 0.3, 0.8]
+  num_workers: 4
+  pin_memory: true
+
+training:
+  total_epochs: 180
+  batch_size: 2
+  
+  # curriculum stages
+  stage1_epochs: 50          # encoder pretraining
+  stage2_epochs: 100         # joint training with CTIM
+  stage3_epochs: 30          # full training with MRCM
+
+  optimizer:
+    type: "AdamW"
+    lr: 0.0002
+    weight_decay: 0.01
+    betas: [0.9, 0.999]
+  
+  scheduler:
+    type: "cosine"
+    eta_min: 0.000001
+
+  # loss weights (Table 3 in paper)
+  loss_weights:
+    sr: 1.5
+    seg: 1.5
+    boundary: 0.5
+    ctim: 0.2
+    mrcm: 0.1
+    # SR sub-losses
+    pixel: 1.0
+    perceptual: 0.1
+    adversarial: 0.01
+
+  augmentation:
+    horizontal_flip: true
+    vertical_flip: true
+    rotation_90: true
+    color_jitter:
+      brightness: 0.2
+      contrast: 0.2
+      saturation: 0.2
+      hue: 0.1
+
+  # checkpointing
+  save_freq: 10
+  val_freq: 5
+  log_freq: 100
+
+evaluation:
+  metrics: ["iou", "dice", "psnr", "ssim"]
+  save_predictions: true
+  save_visualizations: true
+
+inference:
+  ddim_steps: 50
+  batch_size: 1
